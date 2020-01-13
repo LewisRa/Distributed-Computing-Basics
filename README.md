@@ -1,5 +1,23 @@
 # Distributed-Computing-Basics
 
+ A distributed system in its most simplest definition is a group of computers working together as to appear as a single computer to the end-user.
+
+These machines have a **shared state**, operate **concurrently** and can fail independently without affecting the whole system’s uptime.
+if a user inserts a record into node#1, node #3 must be able to return that record.
+
+Traditional databases are stored on the **filesystem** of one single machine, whenever you want to fetch/insert information in it — you talk to that machine directly.
+
+Distributed systems are a headache to deploy, maintain and debug distributed systems,but it enables you to scale hoirzonatlly, meaning
+you add more computers rather than upgrading the hardware of a single one.
+
+Easy scaling is not the only benefit you get from distributed systems. Fault tolerance and low latency are also equally as important.
+
+Fault Tolerance — a cluster of ten machines across two data centers is inherently more fault-tolerant than a single machine. Even if one data center catches on fire, your application would still work.
+
+Low Latency — The time for a network packet to travel the world is physically bounded by the speed of light. For example, the shortest possible time for a request‘s round-trip time (that is, go back and forth) in a fiber-optic cable between New York to Sydney is 160ms. Distributed systems allow you to have a node in both cities, allowing traffic to hit the node that is closest to it.
+
+For a distributed system to work, though, you need the software running on those machines to be specifically designed for running on multiple computers at the same time and handling the problems that come along with it. This turns out to be no easy feat.
+
 ## Distrbuted Computing Example: Google
 - current storage = 15 exabytes
 - Processed per day = 100 petabytes
