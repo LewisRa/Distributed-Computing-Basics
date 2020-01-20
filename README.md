@@ -123,5 +123,30 @@ You tell Salesforce: <br>
 2. SF calls tyou registerd webhookL
 https://mysuperapp.Rach.com/api/v23/sf_user?payload...
 2. The application(MySuperApp) recieves the call and changes email address in the company database too. 
+---
+# Patterns for Building Distributed Systems for The Enterprise
+### Patterns
+- CQRS
+- Event Sourcing
+- Domain Driven Design
+- Event Driven Architectures
+### Theory
+-CAP Theorem - states that we have to forfeit either consistency or availability in the face of a **network partition**
+- Eventual Consistency
+- Full and Partial Order
+**Practice building software using services, queues, Enterprise Service Buses, sagas and histories**
 
+#### Example: Build distributed system that allows customers to redeem gift cards at restaurants. 
+
+Imagine you go to a restaurant or a coffee shop and buy a gift card, and then you can use it at any location in the same chain to pay for food or drinks. And when the card runs low, you can simply add more money to it.
+
+One of the really cool attributes of the distributed system built is that it could cache information at each location. So, when you went to use your card, the point of sales system would already know your balance. It would send the purchase transaction up to the central server, which would then replicate it back down to all the other stores so each store could authorize your purchase without connecting to the central server. It could sync up later. 
+
+This caching feature sped up the line resulting in higher revenues for coffee shop, and it made the system much more reliable. Each store location was connecting to the central server over the internet using **commodity hardware and consumer ISPs**. If we could get a customer on their way without making a connection every time, then the store could continue to do business even when their connection was down. And believe me, these connections went down a lot. 
+
+But we've made a few mistakes when building this system. One of the biggest mistakes is that we stored account balances in the database and not just individual transactions. Now, it may seem like an optimization to store the card balances. After all, you want to check the card balance very quickly. We retained a complete history of all the transactions so we weren't loosing information by storing balances, but it turned out that this one design decision ended up being the single biggest source of problems with reliability, scalability, and correctness of the system. Why was this such a big mistake?
+
+ By updating the card balance immediately upon receiving the transaction and not returning until it was updated, we were working hard to guarantee consistency because the next check for the current balance would have to include the transaction that we just received. What we didn't realize was that in order to guarantee consistency we had to forfeit availability. We didn't see this in the test environment because network partitions were pretty rare, but under load they occurred much more frequently.
+ 
+ 
 
