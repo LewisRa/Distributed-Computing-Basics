@@ -146,6 +146,11 @@ This caching feature sped up the line resulting in higher revenues for coffee sh
 
 But we've made a few mistakes when building this system. One of the biggest mistakes is that we stored account balances in the database and not just individual transactions. Now, it may seem like an optimization to store the card balances. After all, you want to check the card balance very quickly. We retained a complete history of all the transactions so we weren't loosing information by storing balances, but it turned out that this one design decision ended up being the single biggest source of problems with reliability, scalability, and correctness of the system. Why was this such a big mistake?
 
+ ```
+ SELECT Balance WHERE Card = X
+ UPDATE SET Balance = Y WHERE Card = X
+ ```
+ 
  By updating the card balance immediately upon receiving the transaction and not returning until it was updated, we were working hard to guarantee consistency because the next check for the current balance would have to include the transaction that we just received. What we didn't realize was that in order to guarantee consistency we had to forfeit availability. We didn't see this in the test environment because network partitions were pretty rare, but under load they occurred much more frequently.
  
  
