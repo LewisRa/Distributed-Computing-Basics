@@ -200,9 +200,59 @@ The Fallacies of Distributed Computing are:
 #### Domain Driven Design
 Let the problem domain drive the software design and not try to make the problem conform to the capabilities of the software. Too often we approach a problem by modeling it as rows and columns in a database and then writing CRUD operations to manage that data. When we deliver such applications to the business owners, they can often find no relationship between the data grids and input forms that we've delivered and the actual business processes and workflows that they were trying to model. Domain Driven Design seeks to change all that. **Creating N-Tier Applications in C#. Also, check your Pluralsight feed for a future course on DDD**
 
-The three core concepts are: 
-- Ubiquitous Language
-- Bounded Context
-- Aggregate Roots
+The three core concepts are: (Example: PharmaNet)
+### Ubiquitous Language 
+The process of Domain Driven Design begins by agreeing upon a ubiquitous language between the developers and the business owners. This isn't something that we can just jot down in one or two meetings. This is a continuous cultivation and curation of language over the entire lifetime of the project. All of the code is modeled and written using the terms from this ubiquitous language, so any change to the ubiquitous language necessitates a change to the model. That indicates that the understanding has evolved in some way, and so the model has to evolve to capture that new understanding. A ubiquitous language allows developers and business owners to communicate with one another without having to translate.
+
+### Bounded Context
+ In the PharmaNet example,  we found that we had three bounded contexts:
+ - rebates 
+ - sales
+ - performance
+ 
+ The rebates bounded context captured all the rules of the rebate contracts. It was primarily the domain of the account manager. They would specify the measured product groups for each of the rebates, their measurement methods, and the awarded tiers, and they would set up the roles of the contracts. 
+ 
+ **The Rebate system is optimized for providing the account manager with the capability of editing the roles of a rebate contract but Once a rebate enters the performance context it needs to be optimized for a different purpose.**
+ 
+ **Also, in the rebate context, the data structures used tend to be more mutable and interactive so that the account managers could make changes**
+ 
+ The sales bounded context recorded the sales history of each member. Information from the e-commerce and fulfillment systems fed into the sales area.
+ 
+ The performance bounded context calculated the performance of each member toward each of the rebates. It combined the rebated specifications with the sales data to perform its calculations. It presented the outcome of these calculations in the form of report cards for the members to view online. We found this breakdown of the problem into bounded context to be preferable to modeling the entire domain as one enterprise data model. We found that for each context we were trying to solve a specific problem. We could optimize that model specifically for that problem and not have to compromise in order to allow some other context to share the model.
+  
+ **On the other hand, the performance context needs to be optimized for rapid calculation. The data structures that we chose in each context were subtly different to satisfy each need.**
+ 
+ **Also, in the performance context, the data structures tended toward immutable and pluggable strategies so that we could form them into a pipeline of calculations.**
+ 
+ Bounded contexts also offer benefits over enterprise data models in terms of the CAP Theorem. An enterprise data model represents one tightly interconnected cluster of nodes in the distributed system where consistency is prioritized over availability. Any party that needs a consistent view of any part of the enterprise needs to make a connection to this one cluster. The more consumers that connect to it, the less available it becomes. The only way to combat this trend is to reduce the likelihood of a network partition by spending more money on expensive hardware and network management. **An enterprise data model forces you to scale up rather than scaling out, but a bounded context represents a smaller cluster of nodes.** It's decoupled from the other contexts. Because it has its own model, it's not reliant upon its connections to those other contexts. It can make decisions based only on the information that it has on hand. A bounded context could be written to favor availability over consistency. If the system of record is down, then the downstream system is unaffected. It already has a cache of the data that it needs organized and optimized for the problems that it is designed to solve. This isn't automatic. You have to conscientiously choose to build this kind of capability using CQRS, Event Sourcing,etc. 
+
+### Aggregate Roots
+An aggregate root is the top-level entity of an aggregate of children and grandchildren. Business operations are performed on the aggregate as a whole and not on the individual objects within it. The root is the only entity within the aggregate that has global identity, and other aggregates cannot reference any of its children directly. And the root controls how an aggregate is queried, altered, and deleted.
+
+### CQRS
+CQRS stands for Command Query Responsibility Segregation. The pattern is based on a guiding principle called Command Query Separation, but the pattern is applicable to very specific circumstances. 
+### Command Query Separation
+
+Command Query Separation states that a method should either change the state of an object or return a result, but not both. When we're following this principle, we'll separate our methods into these two sets:
+
+- Commands- those that can change state and a command will return void.
+- Query - those that return results. A query will declare a return type. 
+
+ When you separate the methods like this, the caller can be confident that they can execute whatever sequence of queries they need to in order to arrive at a desired result. Then they can make a decision based on that result and record that decision with a single command. This style of use is much easier to reason about because there's only one state change, and that occurs at the end of the sequence. 
+ 
+###  Command Query Responsibility Segregation
+Command Query Responsibility Segregation on the other hand exists to solve a specific problem. It's not a guiding principle, and it's not broadly applicable.
+
+### Collaborative Domains
+The problem that Command Query Responsibility Segregation is really good at solving is a problem of blocking the user when locking the data. 
+
+Example: We have a lot of people who want to reserve seats on an airplane. Some prefer window seats. Others prefer aisles. Some are traveling with children and need to be seated together. There are probably enough seats to satisfy everybody's needs, but there's still a problem. If everyone picks the one seat or the set of seats that they want then that's going to lead to some strange behavior. Invariably, a few people are going to be able to reserve the seat that they want, but then other people are going to be competing for the same seats. The people who don't get the seat that they want are going to have to try again, and they might have to try several times before they can finally find a seat that will suit them. But this problem gets even worse for the family that's trying to get seats together. They might get one or two seats, but then lose the third. They have to give up the seats that they've already reserved in order to find a set that's all together, so they end up playing this game of musical chairs that's not really much fun for anybody. 
+
+This kind of problem is called a collaborative domain. You have a large set of people collaborating on a small set of data. Whenever this occurs you run the risk of forcing the users to try and then retry their operations until they get the desired result. Locking the data is necessary, that's how you ensure that only one person gets a seat, but blocking the user while you do that is not. 
+
+Let's see how else we could solve this problem without blocking the user. Let's introduce a ticketing agent. All of the passengers will give her the specifications for the seats that they want. Some will say I'd like an aisle seat, others will say that I'd like three seats together, and then this ticketing agent gathers all of these requests and then assigns the seats. If she can't assign a passenger the seat that they want then she just says I'm sorry but I reserved a different seat for you. Would you like to keep this reservation or cancel it? This gets the passenger out of the chaos of trying and retrying the seat assignments, and instead it gives that responsibility to just one person. After everything settles, the passengers can query the airplane to see which seats they've been assigned, and they can also see which seats were assigned to other passengers and which seats remain vacant, but what they can't do is change the seat assignments. They can't simply talk to this airplane model and say no I don't want that one. I want a different seat. For that they'll have to go back to the ticketing agent. This s a pretty big tradeoff in the way that we interact with systems. Most of the time we want immediate feedback from a program showing us the change that we have just made. We want an interactive experience from the system. So, for the most part we really don't want to apply CQRS in a lot of situations. The only place where it makes sense is in these collaborative domains whenever we have a large number of people all working together on a small set of data. That's when CQRS can kind of bring order to the chaos. 
+
+###  Pharmanet Example : 
+The fulfillment system feeds into sales and has a large number of customers, and they're all placing orders, and all those orders have to be picked from a very small number of warehouses. And so we've got a large number of users all competing for the same small set of resources on the same small set of data, and so this is actually a perfect example of a collaborative domain. So, let's go ahead and take a closer look at the fulfillment bounded context.
 
 
