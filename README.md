@@ -17,7 +17,21 @@ you add more computers rather than upgrading the hardware of a single one.
 **Low Latency** — The time for a network packet to travel the world is physically bounded by the speed of light. For example, the shortest possible time for a request‘s round-trip time (that is, go back and forth) in a fiber-optic cable between New York to Sydney is 160ms. Distributed systems allow you to have a node in both cities, allowing traffic to hit the node that is closest to it.
 
 For a distributed system to work, though, you need the software running on those machines to be specifically designed for running on multiple computers at the same time and handling the problems that come along with it. This turns out to be no easy feat.
+## Scaling our database
 
+In a typical web application you normally read information much more frequently than you insert new information or modify old one.
+
+#### Master-Slave
+There is a way to increase read performance and that is by the so-called Master-Slave Replication strategy. Here, you create two new database servers which sync up with the main one. The catch is that you can only read from these new instances.Whenever you insert or modify information — you talk to the master database. It, in turn, asynchronously informs the slaves of the change and they save it as well. But you lost the 'C' in ACID: consistency because there now exists a possibility in which we insert a new record into the database, immediately afterwards issue a read query for it and get nothing back.
+
+Propagating the new information from the master to the slave does not happen instantaneously. There actually exists a time window in which you can fetch stale information. If this were not the case, your write performance would suffer, as it would have to synchronously wait for the data to be propagated.
+
+Using the slave database approach, we can horizontally scale our read traffic up to some extent. That’s great but we’ve hit a wall in regards to our write traffic — it’s still all in one server. ----->  **multi-master replication strategy** -With this, instead of slaves that you can only read from, you have multiple master nodes which support reads and writes. Unfortunately, this gets complicated real quick as you now have the ability to create conflicts (e.g insert two records with same ID).
+#### Distributed Data Stores
+Most distributed databases are NoSQL non-relational databases, limited to key-value semantics.
+
+ Apple is known to use 75,000 Apache Cassandra nodes storing over 10 petabytes of data, back in 2015
+---
 ## Distrbuted Computing Example: Google
 - current storage = 15 exabytes
 - Processed per day = 100 petabytes
@@ -27,6 +41,7 @@ For a distributed system to work, though, you need the software running on those
 
 ## Master/Slave Node vs Peer to Peer
 Distributed Computing falls in two broad categories:
+
 
 ## Synchronous vs Asynchronous
 
