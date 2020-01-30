@@ -70,6 +70,7 @@ A message is broadcast from the application which potentially create it (called 
 --RabbitMQ <br>
 --Apache ActiveMQ <br>
 --Amazon SQS (AWS) <br>
+--Microsoft Message Queuing (MSMQ) /Microsoft Distributed Transaction Coordinator (MSDTC) 
  
  ## 5. Distributed Applications (Erlang Machine Machine,BitTorrent)
  BitTorrent is one of the most widely used protocol for transferring large files across the web via torrents(peer to peer). The main idea is to facilitate file transfer between different peers in the network without having to go through a main server.
