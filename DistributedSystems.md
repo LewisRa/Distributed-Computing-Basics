@@ -42,7 +42,7 @@ Apple is known to use 75,000 Apache Cassandra nodes storing over 10 petabytes of
 #### Consensus
 Database transactions are tricky to implement in distributed systems as they require each node to agree on the right action to take (abort or commit). This is known as consensus and it is a fundamental problem in distributed systems. For example, cassandra actually provides lightweight transactions through the use of the Paxos algorithm for distributed consensus.
 
-## 2.Distributed Computing
+## 2. Distributed Computing
 **Distributed Computing falls in two broad categories: Master/Slave Node vs Peer to Peer**?
 Distributed Computing is the technique of splitting an enormous task (e.g aggregate 100 billion records), of which no single computer is capable of practically executing on its own, into many smaller tasks, each of which can fit into a single commodity machine. You split your huge task into many smaller ones, have them execute on many machines in parallel, aggregate the data appropriately and you have solved your initial problem. This approach again enables you to scale horizontally — when you have a bigger task, simply include more nodes in the calculation.
 
@@ -71,7 +71,7 @@ A message is broadcast from the application which potentially create it (called 
 --Apache ActiveMQ <br>
 --Amazon SQS (AWS) <br>
  
- ## 5.Distributed Applications (Erlang Machine Machine,BitTorrent)
+ ## 5. Distributed Applications (Erlang Machine Machine,BitTorrent)
  BitTorrent is one of the most widely used protocol for transferring large files across the web via torrents(peer to peer). The main idea is to facilitate file transfer between different peers in the network without having to go through a main server.
  Using a BitTorrent client, you connect to multiple computers across the world to download a file. When you open a .torrent file, you connect to a so-called tracker, which is a machine that acts as a coordinator. 
  
