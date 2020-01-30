@@ -1,6 +1,8 @@
 # Distributed-Computing-Basics
 
- A distributed system in its most simplest definition is a group of computers working together as to appear as a single computer to the end-user.
+#### Distributed Computing falls in two broad categories: Master/Slave Node vs Peer to Peer
+
+A distributed system in its most simplest definition is a group of computers working together as to appear as a single computer to the end-user.
 
 These machines have a **shared state**, operate **concurrently** and can fail independently without affecting the whole system’s uptime.
 if a user inserts a record into node#1, node #3 must be able to return that record.
@@ -27,115 +29,59 @@ There is a way to increase read performance and that is by the so-called Master-
 Propagating the new information from the master to the slave does not happen instantaneously. There actually exists a time window in which you can fetch stale information. If this were not the case, your write performance would suffer, as it would have to synchronously wait for the data to be propagated.
 
 Using the slave database approach, we can horizontally scale our read traffic up to some extent. That’s great but we’ve hit a wall in regards to our write traffic — it’s still all in one server. ----->  **multi-master replication strategy** -With this, instead of slaves that you can only read from, you have multiple master nodes which support reads and writes. Unfortunately, this gets complicated real quick as you now have the ability to create conflicts (e.g insert two records with same ID).
-#### Distributed Data Stores
+
+#### Sharding (Partitioning)(best avoided until really needed because SQL join are overly complex)
+
+With sharding you split your server into multiple smaller servers, called shards. These shards all hold different records — you create a rule as to what kind of records go into which shard. It is very important to create the rule such that the data gets spread in an uniform way. A possible approach to this is to define ranges according to some information about a record (e.g users with name A-D).
+
+BUT if a single shard receives more requests than others is called a **hot spot** and must be avoided. Once split up, re-sharding data becomes incredibly expensive and can cause significant downtime, as was the case with FourSquare’s infamous 11 hour outage. 
+---
+### Distributed Data Stores
 Most distributed databases are NoSQL non-relational databases, limited to key-value semantics.
 
- Apple is known to use 75,000 Apache Cassandra nodes storing over 10 petabytes of data, back in 2015
----
-## Distrbuted Computing Example: Google
+**Cassandra** <br>
+Cassandra is a distributed No-SQL database which prefers the AP properties out of the CAP, settling with eventual consistency. It uses consistent hashing to determine which nodes out of your cluster must manage the data you are passing in. You set a replication factor, which basically states to how many nodes you want to replicate your data.
+(Cassandra, Couchbase, Hbase, MongoDB)
+
+Apple is known to use 75,000 Apache Cassandra nodes storing over 10 petabytes of data, back in 2015
+
+#### Consensus
+Database transactions are tricky to implement in distributed systems as they require each node to agree on the right action to take (abort or commit). This is known as consensus and it is a fundamental problem in distributed systems. For example, cassandra actually provides lightweight transactions through the use of the Paxos algorithm for distributed consensus.
+
+### Distributed Computing
+Distributed Computing is the technique of splitting an enormous task (e.g aggregate 100 billion records), of which no single computer is capable of practically executing on its own, into many smaller tasks, each of which can fit into a single commodity machine. You split your huge task into many smaller ones, have them execute on many machines in parallel, aggregate the data appropriately and you have solved your initial problem. This approach again enables you to scale horizontally — when you have a bigger task, simply include more nodes in the calculation.
+
+--MapReduce <br>
+--Lambda <br>
+--Kappa <br>
+#### Distrbuted Computing Example: Google
 - current storage = 15 exabytes
 - Processed per day = 100 petabytes
 - number of pages indexed = 60 trillion
 - unique seatch users per month > 1 billion
 - searches by seconds = 2.3 million
 
-## Master/Slave Node vs Peer to Peer
-Distributed Computing falls in two broad categories:
+### Distributed File Systems
+Distributed file systems can be thought of as distributed data stores. They’re the same thing as a concept — storing and accessing a large amount of data across a cluster of machines all appearing as one. They typically go hand in hand with Distributed Computing. **Wikipedia defines the difference being that distributed file systems allow files to be accessed using the same interfaces and semantics as local files, not through a custom API like the Cassandra Query Language (CQL).**
 
+--HDFS
 
-## Synchronous vs Asynchronous
+### Distributed Messaging
+Messaging systems provide a central place for storage and propagation of messages/events inside your overall system. They allow you to decouple your application logic from directly talking with your other systems.
 
-### Synchronous
-The most common example is the standard **blocking HTTP call.**
+A message is broadcast from the application which potentially create it (called a producer), goes into the platform and is read by potentially multiple applications which are interested in it (called consumers).Consumers can either pull information out of the brokers (pull model) or have the brokers push information directly into the consumers (push model).
 
-When you hit an API endpoint, or go to a webpage, you usually make a blocking HTTP to some resource out on the internet.
-
-EXAMPLE:
-1. Client Makes Request and waits (Client Process)
-2. Service gets request and performs some function(s) (Server Process)
-3. Server sends a response (Server Process)
-4. Client gets response, resumes where left off (Client Process)
-
-**This is BLOCKING from the POV client**
-
-Once you make that request ,you will not move forward until that request comes back. On the backend the server could process the request many different ways taht could be fast or slow. But it needs to send that esponse back to unblock the client. 
-
-If too much time passes the server may timeout or the client my close the request.
-
-**Synchronous is time consuming but you do need it sometimes!** Ex2 : Transferring money. 
-
-### Asynchronous
-EXAMPLE: **Amazon.com**
-
-What happens when you click the **Confirm Purchase** button on Amazon?
-
-**What do you physically see?**
-- Your computer gets redirected to a succes screen that: <br>
-"Thanks for you purchase, please shop with us again!"<br>
-AND you can countinue shopping. You are not blocked
-
-**What you do not see?**
-- Amazon's **payment** system needs to kick in to withdraw from your bank account
-- Amazon's **inventory** system needs to kick in track the count of the item you just brought
-- Amazon's **analytics** system gets an update with your purchase stats, machine learning, machine learning models are retrained, your recommendations are improved  etc.
-- Amazon's **dispatch** has to be notified to make sure the warehouse is ready to deliver the item within two days.
-- Etc, etc. 
-
-**Amazon Summary**<br>
-This was a very asynchronous experience. You kept moving forward to shop while other thing happened in the background.
-
-#### 1. Messaging Queueing
-Message queueing is a common way that important notifications and message are sent throughout a large system
-
-Let's use our Amazon example: 
-
-The momentt we press **Confirm Purchase**, a special message &p payload is generated andpuy into a Queue for processing.
-
-Imagine something like this: 
-``` 
-{
-Type: "PurchasedItemOnWebsite",
-ItemId: 2341083, 
-Date: 03/12/20,
-UserId: "David Xiang"
-Price: $323.49
-Prime: NO, 
-Instrutions: "Please put a ribbon on my package"
-}
-```
-
-Other systems in Amazon have the abaility to **observe** that message queue
-
-When this payload is broadcastedm the Payment, Analytics Inventory etc. will kick in: "Oh, Rachel just purchased someting, let me kick off my special processes to handle that."
-
-This general style of communaication is called **Publish/Subscriber** and is a ""broadcast-style" of communication **Apache Kafka**
-
-#### 2. WEBHOOKS
-
-Example 1: Callbacks - Think of thses as Callbacks between computers.
-
-- "Execute this thing first, then call this function when it's done." 
-- "Execute this HTTP request, then call my success() if nothing broke."
-- "Execute this HTTP request, then call my fail() if something broke."
-
-**Webhooks** are essentially between computers.
-
-Another Example: **Syncing with Salesforce**
-
-You decide to integrat with Salesforce. You want to keep a copy of important Salesforce data onyour system to track some analytics with you data.
-
-But what if the data changes every minute?
-What if you have 1000 employees updating SF data.
-
-Salesforce is in the cloud somewhere, outside your syste, how can you keep this sync?
-
-**Via WEBHOOKS**
-
-You tell Salesforce: <br>
-"Hey, any time data changes on your system, I want you to call this special webhook(callback0 ehich hits my system." 
-
-1. An employee logs into SF and changes a user's email address
-2. SF calls tyou registerd webhookL
-https://mysuperapp.Rach.com/api/v23/sf_user?payload...
-2. The application(MySuperApp) recieves the call and changes email address in the company database too. 
----
+--Kafka
+--RabbitMQ
+--Apache ActiveMQ
+--Amazon SQS (AWS)
+ https://www.freecodecamp.org/news/a-thorough-introduction-to-distributed-systems-3b91562c9b3c/
+ 
+ ### Distributed Applications (Erlang Machine Machine,BitTorrent)
+ BitTorrent is one of the most widely used protocol for transferring large files across the web via torrents(peer to peer). The main idea is to facilitate file transfer between different peers in the network without having to go through a main server.
+ Using a BitTorrent client, you connect to multiple computers across the world to download a file. When you open a .torrent file, you connect to a so-called tracker, which is a machine that acts as a coordinator. 
+ 
+ You have the notions of two types of user, a leecher and a seeder. A leecher is the user who is downloading a file and a seeder is the user who is uploading said file.Freeriding, where a user would only download files, was an issue with the previous file sharing protocols.
+ 
+ ### Distributed Ledgers (Blockchain, Ethereum)
+ 
