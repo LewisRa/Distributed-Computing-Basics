@@ -71,11 +71,10 @@ Messaging systems provide a central place for storage and propagation of message
 
 A message is broadcast from the application which potentially create it (called a producer), goes into the platform and is read by potentially multiple applications which are interested in it (called consumers).Consumers can either pull information out of the brokers (pull model) or have the brokers push information directly into the consumers (push model).
 
---Kafka
---RabbitMQ
---Apache ActiveMQ
---Amazon SQS (AWS)
- https://www.freecodecamp.org/news/a-thorough-introduction-to-distributed-systems-3b91562c9b3c/
+--Kafka <br>
+--RabbitMQ <br>
+--Apache ActiveMQ <br>
+--Amazon SQS (AWS) <br>
  
  ## 5.Distributed Applications (Erlang Machine Machine,BitTorrent)
  BitTorrent is one of the most widely used protocol for transferring large files across the web via torrents(peer to peer). The main idea is to facilitate file transfer between different peers in the network without having to go through a main server.
@@ -85,3 +84,4 @@ A message is broadcast from the application which potentially create it (called 
  
  ## 6. Distributed Ledgers (Blockchain, Ethereum)
  
+ https://www.freecodecamp.org/news/a-thorough-introduction-to-distributed-systems-3b91562c9b3c/
