@@ -7,9 +7,9 @@ Distributed systems are a headache to deploy, maintain and debug distributed sys
 
 **Easy scaling is not the only benefit you get from distributed systems. Fault tolerance and low latency are also equally as important.**
 
-**Fault Tolerance** — a cluster of ten machines across two data centers is inherently more fault-tolerant than a single machine. Even if one data center catches on fire, your application would still work.
+- **Fault Tolerance** — a cluster of ten machines across two data centers is inherently more fault-tolerant than a single machine. Even if one data center catches on fire, your application would still work.
 
-**Low Latency** — The time for a network packet to travel the world is physically bounded by the speed of light. For example, the shortest possible time for a request‘s round-trip time (that is, go back and forth) in a fiber-optic cable between New York to Sydney is 160ms. Distributed systems allow you to have a node in both cities, allowing traffic to hit the node that is closest to it.
+- **Low Latency** — The time for a network packet to travel the world is physically bounded by the speed of light. For example, the shortest possible time for a request‘s round-trip time (that is, go back and forth) in a fiber-optic cable between New York to Sydney is 160ms. Distributed systems allow you to have a node in both cities, allowing traffic to hit the node that is closest to it.
 
 For a distributed system to work, though, you need the software running on those machines to be specifically designed for running on multiple computers at the same time and handling the problems that come along with it. This turns out to be no easy feat.
 
@@ -30,7 +30,8 @@ With sharding you split your server into multiple smaller servers, called shards
 **BUT if a single shard receives more requests than others is called a hot spot and must be avoided. Once split up, re-sharding data becomes incredibly expensive and can cause significant downtime, as was the case with FourSquare’s infamous 11 hour outage** 
 
 ---
-## 1. Distributed Data Stores
+## Types of Distributed  Systems 
+### 1. Distributed Data Stores
 Most distributed databases are NoSQL non-relational databases, limited to key-value semantics.
 
 **Cassandra** <br>
@@ -42,7 +43,7 @@ Apple is known to use 75,000 Apache Cassandra nodes storing over 10 petabytes of
 #### Consensus
 Database transactions are tricky to implement in distributed systems as they require each node to agree on the right action to take (abort or commit). This is known as consensus and it is a fundamental problem in distributed systems. For example, cassandra actually provides lightweight transactions through the use of the Paxos algorithm for distributed consensus.
 
-## 2. Distributed Computing
+### 2. Distributed Computing
 **Distributed Computing falls in two broad categories: Master/Slave Node vs Peer to Peer**?
 Distributed Computing is the technique of splitting an enormous task (e.g aggregate 100 billion records), of which no single computer is capable of practically executing on its own, into many smaller tasks, each of which can fit into a single commodity machine. You split your huge task into many smaller ones, have them execute on many machines in parallel, aggregate the data appropriately and you have solved your initial problem. This approach again enables you to scale horizontally — when you have a bigger task, simply include more nodes in the calculation.
 
@@ -56,12 +57,12 @@ Distributed Computing is the technique of splitting an enormous task (e.g aggreg
 - unique seatch users per month > 1 billion
 - searches by seconds = 2.3 million
 
-## 3. Distributed File Systems
+### 3. Distributed File Systems
 Distributed file systems can be thought of as distributed data stores. They’re the same thing as a concept — storing and accessing a large amount of data across a cluster of machines all appearing as one. They typically go hand in hand with Distributed Computing. **Wikipedia defines the difference being that distributed file systems allow files to be accessed using the same interfaces and semantics as local files, not through a custom API like the Cassandra Query Language (CQL).**
 
 --HDFS
 
-## 4. Distributed Messaging
+### 4. Distributed Messaging
 Messaging systems provide a central place for storage and propagation of messages/events inside your overall system. They allow you to decouple your application logic from directly talking with your other systems.
 
 A message is broadcast from the application which potentially create it (called a producer), goes into the platform and is read by potentially multiple applications which are interested in it (called consumers).Consumers can either pull information out of the brokers (pull model) or have the brokers push information directly into the consumers (push model).
@@ -72,12 +73,12 @@ A message is broadcast from the application which potentially create it (called 
 --Amazon SQS (AWS) <br>
 --Microsoft Message Queuing (MSMQ) /Microsoft Distributed Transaction Coordinator (MSDTC) 
  
- ## 5. Distributed Applications (Erlang Machine Machine,BitTorrent)
+ ### 5. Distributed Applications (Erlang Machine Machine, BitTorrent)
  BitTorrent is one of the most widely used protocol for transferring large files across the web via torrents(peer to peer). The main idea is to facilitate file transfer between different peers in the network without having to go through a main server.
  Using a BitTorrent client, you connect to multiple computers across the world to download a file. When you open a .torrent file, you connect to a so-called tracker, which is a machine that acts as a coordinator. 
  
  You have the notions of two types of user, a leecher and a seeder. A leecher is the user who is downloading a file and a seeder is the user who is uploading said file.Freeriding, where a user would only download files, was an issue with the previous file sharing protocols.
  
- ## 6. Distributed Ledgers (Blockchain, Ethereum)
+ ### 6. Distributed Ledgers (Blockchain, Ethereum)
  ---
  https://www.freecodecamp.org/news/a-thorough-introduction-to-distributed-systems-3b91562c9b3c/
