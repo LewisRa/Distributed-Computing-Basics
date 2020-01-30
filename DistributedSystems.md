@@ -78,5 +78,5 @@ A message is broadcast from the application which potentially create it (called 
  You have the notions of two types of user, a leecher and a seeder. A leecher is the user who is downloading a file and a seeder is the user who is uploading said file.Freeriding, where a user would only download files, was an issue with the previous file sharing protocols.
  
  ## 6. Distributed Ledgers (Blockchain, Ethereum)
- 
+ ---
  https://www.freecodecamp.org/news/a-thorough-introduction-to-distributed-systems-3b91562c9b3c/
