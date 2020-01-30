@@ -1,16 +1,9 @@
-# Distributed-Computing-Basics
-
-#### Distributed Computing falls in two broad categories: Master/Slave Node vs Peer to Peer
-
+# Distributed Systems Basics
 A distributed system in its most simplest definition is a group of computers working together as to appear as a single computer to the end-user.
 
-These machines have a **shared state**, operate **concurrently** and can fail independently without affecting the whole system’s uptime.
-if a user inserts a record into node#1, node #3 must be able to return that record.
+Traditional databases are stored on the **filesystem** of one single machine, whenever you want to fetch/insert information in it — you talk to that machine directly but with distributed systems, all cluster machines have a **shared state**, operate **concurrently** and can fail independently without affecting the whole system’s uptime. EX: If a user inserts a record into node #1, node #3 must be able to return that record.
 
-Traditional databases are stored on the **filesystem** of one single machine, whenever you want to fetch/insert information in it — you talk to that machine directly.
-
-Distributed systems are a headache to deploy, maintain and debug distributed systems,but it enables you to scale hoirzonatlly, meaning
-you add more computers rather than upgrading the hardware of a single one.
+Distributed systems are a headache to deploy, maintain and debug distributed systems,but it enables you to scale **horizontally**, meaning you add more computers rather than upgrading the hardware of a single one **vertically**.
 
 **Easy scaling is not the only benefit you get from distributed systems. Fault tolerance and low latency are also equally as important.**
 
@@ -19,8 +12,9 @@ you add more computers rather than upgrading the hardware of a single one.
 **Low Latency** — The time for a network packet to travel the world is physically bounded by the speed of light. For example, the shortest possible time for a request‘s round-trip time (that is, go back and forth) in a fiber-optic cable between New York to Sydney is 160ms. Distributed systems allow you to have a node in both cities, allowing traffic to hit the node that is closest to it.
 
 For a distributed system to work, though, you need the software running on those machines to be specifically designed for running on multiple computers at the same time and handling the problems that come along with it. This turns out to be no easy feat.
-## Scaling our database
 
+---
+## Ex: Scaling a database
 In a typical web application you normally read information much more frequently than you insert new information or modify old one.
 
 #### Master-Slave
@@ -49,6 +43,7 @@ Apple is known to use 75,000 Apache Cassandra nodes storing over 10 petabytes of
 Database transactions are tricky to implement in distributed systems as they require each node to agree on the right action to take (abort or commit). This is known as consensus and it is a fundamental problem in distributed systems. For example, cassandra actually provides lightweight transactions through the use of the Paxos algorithm for distributed consensus.
 
 ## 2.Distributed Computing
+**Distributed Computing falls in two broad categories: Master/Slave Node vs Peer to Peer**?
 Distributed Computing is the technique of splitting an enormous task (e.g aggregate 100 billion records), of which no single computer is capable of practically executing on its own, into many smaller tasks, each of which can fit into a single commodity machine. You split your huge task into many smaller ones, have them execute on many machines in parallel, aggregate the data appropriately and you have solved your initial problem. This approach again enables you to scale horizontally — when you have a bigger task, simply include more nodes in the calculation.
 
 --MapReduce <br>
