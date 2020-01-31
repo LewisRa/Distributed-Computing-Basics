@@ -149,3 +149,45 @@ For PhamaNet, we use recoverable messages stored in transactional queues that ar
 
 #### Enable MSMQ and MSDTC
 To enable MSMQ:  go to the Control Panel, go in to Programs, and then I can turn on Windows Features. And then I open up Microsoft Message Queuing. The minimum that you'll want to check is MSMQ HTTP Support, which will also bring in the core services. You can turn on these other options if you choose, but for most purposes HTTP Support is going to be sufficient. Then we want to turn on the Distributed Transaction Coordinator, so for that I'm going to run dcomcnfg. That's D-C-O-M-C-N-F-G. When I run that, that's going to bring up my Component Services. I can open that up, go to My Computer, and when I right-click and go to Properties I've got an MSDTC tab that's the Microsoft Distributed Transaction Coordinator, and I want to be sure that use local coordinator is checked. And then with that checked, I can go into the Distributed Transaction Coordinator Folder, right-click on Local DTC, and go to Properties. And for this demo, the default Security Settings with everything turned off are going to be sufficient because I'll be using the Distributed Transaction Coordinator with a private queue and SQL Server running on this box. But if I were to access SQL Server on a different box, then I would want to turn on the Security Settings. So, then I would want to enable the Network DTC Access, Allow the Remote Clients, but I don't need to Allow Remote Administration, Allow Inbound and Outbound, and for simplicity sake because I'm not relying upon Active Directory for anything I'll use No Authentication. Then I'll want to enable the XA Transactions so that I can share those transactions with SQL Server, and this will be the configuration that I use when I have SQL Server running on a different machine. And on that machine I will also need to configure the Security Settings for MSDTC. But since I'm doing everything locally, I don't need to enable any of those settings in order for this next part to work. So, now let's go into our code and change things up so that we're using MSMQ and the Distributed Transaction Coordinator from our code.
+
+
+
+when we're trying to move large
+quantities of data often the tool of
+choice is an ETL tool which stands for
+extract transform and load
+however when we're communicating between
+individual application processes we
+often use an enterprise service bus or
+ESB 
+
+ unique challenges
+of moving bulk data vs as real-time
+transaction data 
+
+on
+the other hand requires a real-time
+service to be constantly monitoring
+transactions this is because ESB tools
+are often talking between applications
+for example imagine you have a closed
+opportunity in your crm and you want
+that closed opportunity to trigger an
+invoicing process for your accounts
+receivable system now rather than hand
+entering all of the information you
+would set up a service bus which would
+carry the relevant information to your
+accounts receivable group speeding up
+the invoice creation process now this
+would be akin to using a bicycle in a
+previous example it's not great for
+moving
+
+etl and esb is middleware
+latency flexibility
+and transformation flexibility
+
+we're going to understand how this tool works. There are two basic kinds of Enterprise Service Bus. There's the brokered service bus and the decentralized service bus. A brokered service bus is characterized by having a single point of configuration. This is one place where you can go to deploy your services and configure them. For that reason, this type of service bus tends to support a single governing body that is very hands on in the enterprise. This might be a change management team, or an operations team, or maybe even a system architecture team. That one governing body deploys the services and configures them. The advantage of using a brokered service bus is that the middleware is capable of making decisions on message routing and prioritization. Typical brokered service busses are products like TIBCO, BizTalk, and Web Sphere. The second kind of enterprise service bus is decentralized. These tend to be collections of independently configurable services. They're characterized by a collaboration among many independent teams. Whereas a brokered service bus has intelligent middleware for making routing and prioritization decisions, a decentralized service bus relies upon the services themselves to make all these decisions. The middleware is pretty dumb. Some typical decentralized services busses are NServiceBus, MassTransit, and Rhino Service Bus
+
+use the service bus to scale our queries independently of our commands. The next thing that we build is an integration between bounded contexts. We're going to build this integration by publishing events. And then third, we're going to manage dependencies between those bounded contexts. We will do this by subscribing to events.
